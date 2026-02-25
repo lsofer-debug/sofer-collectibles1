@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sofer Collectibles LLC — The Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface2: #f0f0f0;
+    --border: #e0e0e0;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --gold-dim: #c9a84c;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --red: #d93025;
+    --green: #1e8c45;
+    --blue: #1a5dc8;
+    --purple: #7b2cbf;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 15% 15%, rgba(184,134,11,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 85%, rgba(26,93,200,0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    display: flex; flex-direction: column; line-height: 1.1;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+  }
+
+  .logo-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .header-stats {
+    display: flex; gap: 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .header-stat span { color: var(--gold); font-weight: 500; }
+
+  /* APP */
+  .app {
+    position: relative; z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* SUMMARY */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .summary-card:hover { border-color: var(--gold-dim); }
+
+  .summary-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+
+  .summary-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .summary-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .summary-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-wrap {
+    flex: 1; min-width: 220px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); pointer-events: none;
+  }
+
+  input[type="text"], select, input[type="number"] {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input[type="text"]:focus, select:focus, input[type="number"]:focus {
+    border-color: var(--gold-dim);
+  }
+
+  .search-input { padding-left: 2.5rem !important; }
+  select { cursor: pointer; }
+  select option { background: #ffffff; color: #1a1a1a; }
+
+  .btn {
+    background: var(--gold);
+    color: #0d0f14;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: none; border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 0.4rem;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: var(--gold-light); }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .btn-ghost:hover { border-color: var(--gold-dim); color: var(--gold); background: transparent; }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--text);
+  }
+
+  .result-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--text-muted);
+  }
+
+  .table-scroll { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+  thead th {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  thead th:hover { color: var(--gold); }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(37,42,56,0.5);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 0.55rem 0.6rem; vertical-align: middle; font-size: 0.8rem; }
+
+  .card-name { font-weight: 500; color: var(--text); }
+  .card-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.68rem; font-family: 'DM Mono', monospace;
+    padding: 3px 9px; border-radius: 100px; font-weight: 500;
+  }
+
+  .type-Sports { background: rgba(26,93,200,0.1); color: var(--blue); }
+  .type-TCG    { background: rgba(123,44,191,0.1); color: var(--purple); }
+
+  .cond-Mint, .cond-NM   { background: rgba(30,140,69,0.1); color: var(--green); }
+  .cond-VG               { background: rgba(184,134,11,0.12); color: var(--gold); }
+  .cond-Good, .cond-LP   { background: rgba(184,134,11,0.08); color: #9a6f00; }
+  .cond-Fair, .cond-MP   { background: rgba(217,48,37,0.08); color: #b03020; }
+  .cond-Poor, .cond-HP   { background: rgba(217,48,37,0.14); color: var(--red); }
+
+  .val-cell  { font-family: 'DM Mono', monospace; color: var(--green); font-weight: 500; }
+  .cost-cell { font-family: 'DM Mono', monospace; color: var(--text-muted); }
+  .gain-cell { font-family: 'DM Mono', monospace; font-size: 0.8rem; }
+  .gain-pos  { color: var(--green); }
+  .gain-neg  { color: var(--red); }
+  .gain-zero { color: var(--text-muted); }
+
+  .actions-cell { display: flex; gap: 0.4rem; justify-content: flex-end; }
+
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 26px; height: 26px;
+    border-radius: 5px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-size: 0.72rem;
+    text-decoration: none;
+  }
+
+  .icon-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .icon-btn.del:hover { border-color: var(--red); color: var(--red); }
+
+  .cl-btn {
+    background: #1a5dc8;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    padding: 0 9px;
+    height: 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 2px 6px rgba(26,93,200,0.25);
+  }
+
+  .cl-btn:hover { background: #1348a0; transform: scale(1.03); }
+  .cl-btn:active { transform: scale(0.97); }
+
+  .empty-state {
+    text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+  }
+
+  .empty-state svg { margin-bottom: 1rem; opacity: 0.3; }
+  .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--text); margin-bottom: 0.5rem; font-size: 1.25rem; }
+  .empty-state p { font-size: 0.875rem; }
+
+  /* MODAL */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+    padding: 1rem;
+  }
+
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%; max-width: 540px;
+    max-height: 90vh; overflow-y: auto;
+    transform: translateY(16px);
+    transition: transform 0.22s;
+    position: relative;
+  }
+
+  .overlay.open .modal { transform: translateY(0); }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem; color: var(--gold);
+    margin-bottom: 1.5rem; padding-right: 2rem;
+  }
+
+  .modal-close {
+    position: absolute; top: 1.5rem; right: 1.5rem;
+    background: transparent; border: none;
+    color: var(--text-muted); cursor: pointer;
+    font-size: 1.1rem; line-height: 1;
+    transition: color 0.15s;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-grid .full { grid-column: 1 / -1; }
+
+  .fg label {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); margin-bottom: 0.4rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: 0.75rem;
+    margin-top: 1.5rem; padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 680px) {
+    .header-stats { display: none; }
+    .form-grid { grid-template-columns: 1fr; }
+    .app { padding: 1rem; }
+    table { font-size: 0.78rem; }
+    td, thead th { padding: 0.65rem 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">🃏</div>
+    <div class="logo-text">
+      <span class="logo-name">Sofer Collectibles</span>
+      <span class="logo-sub">LLC · The Vault</span>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat">Cards: <span id="hdr-count">0</span></div>
+    <div class="header-stat">Value: <span id="hdr-value">$0.00</span></div>
+    <div class="header-stat">Invested: <span id="hdr-cost">$0.00</span></div>
+    <div class="header-stat">P/L: <span id="hdr-pl">$0.00</span></div>
+  </div>
+</header>
+
+<div class="app">
+
+  <div class="summary-row">
+    <div class="summary-card">
+      <div class="summary-label">Total Cards</div>
+      <div class="summary-value" id="s-total">0</div>
+      <div class="summary-sub" id="s-types">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Collection Value</div>
+      <div class="summary-value" id="s-value">$0.00</div>
+      <div class="summary-sub">current market estimate</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Total Invested</div>
+      <div class="summary-value" id="s-cost">$0.00</div>
+      <div class="summary-sub">cost basis</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Total Gain / Loss</div>
+      <div class="summary-value" id="s-pl" style="font-size:1.5rem">$0.00</div>
+      <div class="summary-sub" id="s-pl-pct">0.00%</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Top Card by Value</div>
+      <div class="summary-value" id="s-top-val" style="font-size:1.2rem; padding-top:4px">—</div>
+      <div class="summary-sub" id="s-top-name">—</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" type="text" id="q-search" placeholder="Search name, set, player, year, notes…" oninput="render()">
+    </div>
+    <select id="q-type" onchange="render()">
+      <option value="">All Types</option>
+      <option>Sports</option>
+      <option>TCG</option>
+    </select>
+    <select id="q-cond" onchange="render()">
+      <option value="">All Conditions</option>
+      <option>Mint</option><option>NM</option><option>VG</option>
+      <option>Good</option><option>LP</option><option>MP</option>
+      <option>HP</option><option>Poor</option>
+    </select>
+    <select id="q-sort" onchange="render()">
+      <option value="name-asc">Name A–Z</option>
+      <option value="value-desc">Value: High–Low</option>
+      <option value="cost-desc">Cost: High–Low</option>
+      <option value="gain-desc">Gain: High–Low</option>
+      <option value="year-desc">Year: Newest</option>
+      <option value="year-asc">Year: Oldest</option>
+    </select>
+    <button class="btn" onclick="openModal()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Add Card
+    </button>
+    <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-header-row">
+      <div class="table-title">Inventory</div>
+      <div class="result-count" id="result-count">0 cards</div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Card / Set</th>
+            <th>Type</th>
+            <th>Year</th>
+            <th>Condition</th>
+            <th>PSA #</th>
+            <th>Qty</th>
+            <th>Value</th>
+            <th>Cost Paid</th>
+            <th>Date Purchased</th>
+            <th>Purchased From</th>
+            <th>Gain / Loss</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="empty" class="empty-state" style="display:none">
+      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+        <rect x="2" y="3" width="20" height="15" rx="2"/>
+        <path d="M8 21h8M12 18v3M9 9h6M9 12h4"/>
+      </svg>
+      <h3>No cards found</h3>
+      <p>Adjust your filters or add your first card to the vault.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-title" id="modal-title">Add Card</div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <div class="form-grid">
+      <div class="fg full">
+        <label>Card Name *</label>
+        <input type="text" id="f-name" placeholder="e.g. Michael Jordan, Charizard, Tom Brady">
+      </div>
+      <div class="fg">
+        <label>Type *</label>
+        <select id="f-type">
+          <option value="Sports">Sports</option>
+          <option value="TCG">TCG</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Year</label>
+        <input type="text" id="f-year" placeholder="e.g. 1986">
+      </div>
+      <div class="fg full">
+        <label>Set / Series</label>
+        <input type="text" id="f-set" placeholder="e.g. Fleer, Topps Chrome, Pokémon Base Set">
+      </div>
+      <div class="fg">
+        <label>Card # / Grade</label>
+        <input type="text" id="f-number" placeholder="e.g. #57, PSA 10">
+      </div>
+      <div class="fg">
+        <label>Condition</label>
+        <select id="f-cond">
+          <option>Mint</option><option>NM</option><option>VG</option>
+          <option>Good</option><option>LP</option><option>MP</option>
+          <option>HP</option><option>Poor</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>PSA #</label>
+        <input type="text" id="f-psa" placeholder="e.g. 12345678">
+      </div>
+      <div class="fg">
+        <label>Quantity</label>
+        <input type="number" id="f-qty" placeholder="1" min="1" value="1">
+      </div>
+      <div class="fg">
+        <label>Current Value ($)</label>
+        <input type="number" id="f-value" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="fg">
+        <label>Cost Paid ($)</label>
+        <input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="fg">
+        <label>Date Purchased</label>
+        <input type="date" id="f-date-purchased">
+      </div>
+      <div class="fg">
+        <label>Purchased From</label>
+        <input type="text" id="f-purchased-from" placeholder="e.g. eBay, PWCC, Local show…">
+      </div>
+      <div class="fg full">
+        <label>Notes</label>
+        <input type="text" id="f-notes" placeholder="Rookie card, autograph, foil, graded, purchase source…">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn" id="save-btn" onclick="saveCard()">Save Card</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const STORE_KEY = 'sofer_vault_v1';
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch { return []; }
+}
+
+function save() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(cards));
+}
+
+let cards = load();
+let editId = null;
+
+// Demo seed if empty
+if (cards.length === 0) {
+  cards = [
+    { id: uid(), name: 'Michael Jordan', type: 'Sports', year: '1986', set: 'Fleer', number: '#57', cond: 'NM', qty: 1, value: 3800, cost: 1200, notes: 'Rookie card' },
+    { id: uid(), name: 'Charizard', type: 'TCG', year: '1999', set: 'Pokémon Base Set', number: '#4/102 Holo', cond: 'VG', qty: 1, value: 420, cost: 180, notes: '1st Edition stamp' },
+    { id: uid(), name: 'Patrick Mahomes', type: 'Sports', year: '2017', set: 'Panini Prizm', number: '#269', cond: 'Mint', qty: 2, value: 260, cost: 95, notes: 'Rookie card, silver prizm' },
+    { id: uid(), name: 'Pikachu', type: 'TCG', year: '1999', set: 'Pokémon Base Set', number: '#58/102', cond: 'Good', qty: 3, value: 35, cost: 12, notes: '' },
+    { id: uid(), name: 'LeBron James', type: 'Sports', year: '2003', set: 'Topps Chrome', number: '#111', cond: 'NM', qty: 1, value: 1800, cost: 900, notes: 'Rookie year' },
+  ];
+  save();
+}
+
+function uid() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function filtered() {
+  const q = document.getElementById('q-search').value.toLowerCase().trim();
+  const type = document.getElementById('q-type').value;
+  const cond = document.getElementById('q-cond').value;
+  const sort = document.getElementById('q-sort').value;
+
+  let list = cards.filter(c => {
+    const hay = [c.name, c.set, c.number, c.year, c.notes].join(' ').toLowerCase();
+    return (!q || hay.includes(q))
+      && (!type || c.type === type)
+      && (!cond || c.cond === cond);
+  });
+
+  const [field, dir] = sort.split('-');
+  list.sort((a, b) => {
+    let av, bv;
+    if (field === 'name') { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
+    else if (field === 'value') { av = +a.value || 0; bv = +b.value || 0; }
+    else if (field === 'cost')  { av = +a.cost  || 0; bv = +b.cost  || 0; }
+    else if (field === 'gain')  { av = (+a.value||0) - (+a.cost||0); bv = (+b.value||0) - (+b.cost||0); }
+    else if (field === 'year')  { av = +a.year || 0; bv = +b.year || 0; }
+    if (dir === 'asc') return av > bv ? 1 : av < bv ? -1 : 0;
+    return av < bv ? 1 : av > bv ? -1 : 0;
+  });
+
+  return list;
+}
+
+function fmt$(n) {
+  const v = parseFloat(n) || 0;
+  return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function gainStr(c) {
+  const g = (parseFloat(c.value) || 0) - (parseFloat(c.cost) || 0);
+  if (c.cost == null || c.cost === '' || (c.value == null && c.cost == null)) return '<span class="gain-zero">—</span>';
+  const sign = g > 0 ? '+' : '';
+  const cls = g > 0 ? 'gain-pos' : g < 0 ? 'gain-neg' : 'gain-zero';
+  return `<span class="${cls}">${sign}${fmt$(g)}</span>`;
+}
+
+function render() {
+  const list = filtered();
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('empty');
+
+  // Stats
+  const totVal  = cards.reduce((s, c) => s + (parseFloat(c.value) || 0) * (parseInt(c.qty) || 1), 0);
+  const totCost = cards.reduce((s, c) => s + (parseFloat(c.cost)  || 0) * (parseInt(c.qty) || 1), 0);
+  const pl = totVal - totCost;
+  const plPct = totCost > 0 ? ((pl / totCost) * 100).toFixed(2) : '0.00';
+  const sports = cards.filter(c => c.type === 'Sports').length;
+  const tcg    = cards.filter(c => c.type === 'TCG').length;
+  const top    = [...cards].sort((a,b) => (parseFloat(b.value)||0) - (parseFloat(a.value)||0))[0];
+  const totalQty = cards.reduce((s, c) => s + (parseInt(c.qty) || 1), 0);
+
+  document.getElementById('hdr-count').textContent = totalQty;
+  document.getElementById('hdr-value').textContent = fmt$(totVal);
+  document.getElementById('hdr-cost').textContent  = fmt$(totCost);
+  const hdrPl = document.getElementById('hdr-pl');
+  hdrPl.textContent = (pl >= 0 ? '+' : '') + fmt$(pl);
+  hdrPl.style.color = pl >= 0 ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('s-total').textContent = totalQty;
+  document.getElementById('s-types').textContent = `${sports} Sports · ${tcg} TCG`;
+  document.getElementById('s-value').textContent = fmt$(totVal);
+  document.getElementById('s-cost').textContent  = fmt$(totCost);
+  const plEl = document.getElementById('s-pl');
+  plEl.textContent = (pl >= 0 ? '+' : '') + fmt$(pl);
+  plEl.style.color = pl >= 0 ? 'var(--green)' : 'var(--red)';
+  const pctEl = document.getElementById('s-pl-pct');
+  pctEl.textContent = (pl >= 0 ? '+' : '') + plPct + '%';
+  pctEl.style.color = pl >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('s-top-val').textContent = top ? fmt$(top.value) : '—';
+  document.getElementById('s-top-name').textContent = top ? top.name : '—';
+
+  document.getElementById('result-count').textContent = list.length + ' card' + (list.length !== 1 ? 's' : '');
+
+  if (!list.length) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = list.map(c => {
+    const qty = parseInt(c.qty) || 1;
+    const valDisplay  = c.value != null && c.value !== '' ? fmt$(c.value) : '—';
+    const costDisplay = c.cost  != null && c.cost  !== '' ? fmt$(c.cost)  : '—';
+    return `
+    <tr data-id="${c.id}" class="card-row">
+      <td>
+        <div class="card-name">${esc(c.name)}</div>
+        <div class="card-meta">${esc(c.set || '—')}${c.number ? ' · ' + esc(c.number) : ''}${c.notes ? ' · ' + esc(c.notes) : ''}</div>
+      </td>
+      <td><span class="badge type-${c.type}">${c.type}</span></td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--text-muted)">${esc(c.year || '—')}</span></td>
+      <td><span class="badge cond-${c.cond}">${c.cond}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--text-muted)">${esc(c.psa || '—')}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.82rem">${qty}</td>
+      <td class="val-cell">${valDisplay}</td>
+      <td class="cost-cell">${costDisplay}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--text-muted)">${esc(c.datePurchased || '—')}</td>
+      <td style="font-size:0.82rem;color:var(--text-muted)">${esc(c.purchasedFrom || '—')}</td>
+      <td class="gain-cell">${gainStr(c)}</td>
+      <td>
+        <div class="actions-cell">
+          ${c.psa ? `<a class="cl-btn" title="Search on Card Ladder" href="https://app.cardladder.com/search?grader=psa&cert=${c.psa}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🪜 Card Ladder</a>` : ''}
+          ${c.psa ? `<a class="icon-btn" title="Verify on PSA" href="https://www.psacard.com/cert/${c.psa}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🏅</a>` : ''}
+          <button class="icon-btn" title="Edit" data-action="edit" data-id="${c.id}">✏️</button>
+          <button class="icon-btn del" title="Delete" data-action="delete" data-id="${c.id}">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(card) {
+  editId = card ? card.id : null;
+  document.getElementById('modal-title').textContent = card ? 'Edit Card' : 'Add Card';
+  document.getElementById('save-btn').textContent = card ? 'Save Changes' : 'Save Card';
+
+  document.getElementById('f-name').value   = card?.name   || '';
+  document.getElementById('f-type').value   = card?.type   || 'Sports';
+  document.getElementById('f-year').value   = card?.year   || '';
+  document.getElementById('f-set').value    = card?.set    || '';
+  document.getElementById('f-number').value = card?.number || '';
+  document.getElementById('f-cond').value   = card?.cond   || 'NM';
+  document.getElementById('f-psa').value    = card?.psa    || '';
+  document.getElementById('f-qty').value    = card?.qty    ?? 1;
+  document.getElementById('f-value').value  = card?.value  ?? '';
+  document.getElementById('f-cost').value   = card?.cost   ?? '';
+  document.getElementById('f-date-purchased').value  = card?.datePurchased  || '';
+  document.getElementById('f-purchased-from').value  = card?.purchasedFrom  || '';
+  document.getElementById('f-notes').value  = card?.notes  || '';
+
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  editId = null;
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+function saveCard() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+
+  const card = {
+    id:     editId || uid(),
+    name,
+    type:   document.getElementById('f-type').value,
+    year:   document.getElementById('f-year').value.trim(),
+    set:    document.getElementById('f-set').value.trim(),
+    number: document.getElementById('f-number').value.trim(),
+    cond:   document.getElementById('f-cond').value,
+    psa:    document.getElementById('f-psa').value.trim(),
+    qty:    parseInt(document.getElementById('f-qty').value) || 1,
+    value:  document.getElementById('f-value').value !== '' ? parseFloat(document.getElementById('f-value').value) : null,
+    cost:   document.getElementById('f-cost').value  !== '' ? parseFloat(document.getElementById('f-cost').value)  : null,
+    datePurchased:  document.getElementById('f-date-purchased').value.trim(),
+    purchasedFrom:  document.getElementById('f-purchased-from').value.trim(),
+    notes:  document.getElementById('f-notes').value.trim(),
+  };
+
+  if (editId) {
+    const idx = cards.findIndex(c => c.id === editId);
+    if (idx > -1) cards[idx] = card;
+  } else {
+    cards.unshift(card);
+  }
+
+  save();
+  closeModal();
+  render();
+}
+
+function editCard(id) {
+  const card = cards.find(c => c.id === id);
+  if (card) openModal(card);
+}
+
+function deleteCard(id) {
+  const card = cards.find(c => c.id === id);
+  if (!card) return;
+  if (!confirm(`Delete "${card.name}" from the vault?`)) return;
+  cards = cards.filter(c => c.id !== id);
+  save();
+  render();
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const headers = ['Name','Type','Year','Set','Card #','Condition','PSA #','Qty','Value','Cost','Date Purchased','Purchased From','Gain/Loss','Notes'];
+  const rows = cards.map(c => {
+    const gain = ((parseFloat(c.value)||0) - (parseFloat(c.cost)||0)).toFixed(2);
+    return [c.name, c.type, c.year, c.set, c.number, c.cond, c.psa || '', c.qty,
+            c.value ?? '', c.cost ?? '', c.datePurchased || '', c.purchasedFrom || '', gain, c.notes].map(v => `"${String(v).replace(/"/g,'""')}"`);
+  });
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'sofer-collectibles-vault.csv';
+  a.click();
+}
+
+// ── TABLE CLICK DELEGATION ────────────────────────────────────────────────────
+document.getElementById('tbody').addEventListener('click', e => {
+  const btn = e.target.closest('[data-action]');
+  if (btn) {
+    e.stopPropagation();
+    const id = btn.dataset.id;
+    if (btn.dataset.action === 'delete') deleteCard(id);
+    if (btn.dataset.action === 'edit')   editCard(id);
+    return;
+  }
+  // Click anywhere else on the row → edit
+  const row = e.target.closest('tr.card-row');
+  if (row) editCard(row.dataset.id);
+});
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('q-search').focus();
+  }
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
